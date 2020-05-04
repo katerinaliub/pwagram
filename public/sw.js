@@ -1,5 +1,5 @@
-var CACHE_STATIC_NAME = 'static-v9';
-var CACHE_DYNAMIC_NAME = 'dynamic-v3';
+var CACHE_STATIC_NAME = 'static-v12';
+var CACHE_DYNAMIC_NAME = 'dynamic-v4';
 
 self.addEventListener('install', function (event) {
     console.log('[SW] Installing SW ...', event);
@@ -10,6 +10,7 @@ self.addEventListener('install', function (event) {
                 cache.addAll([
                     '/',
                     '/index.html',
+                    '/offline.html',
                     '/src/js/app.js',
                     '/src/js/feed.js',
                     '/src/js/material.min.js',
@@ -56,7 +57,10 @@ self.addEventListener('fetch', function (event) {
                                 })
                         })
                         .catch(function (err) {
-
+                            return caches.open(CACHE_STATIC_NAME)
+                                .then(function (cache) {
+                                    return cache.match('/offline.html')
+                                });
                         })
                 }
             })

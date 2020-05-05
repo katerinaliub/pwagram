@@ -20,6 +20,17 @@ function openCreatePostModal() {
 
     deferredPrompt = null;
   }
+
+
+//Service Worker unregistering
+  // if ('serviceWorker' in navigator) {
+  //   navigator.serviceWorker.getRegistrations()
+  //       .then(function (registrations) {
+  //         for (var i = 0; i < registrations.length; i++) {
+  //           registrations[i].unregister();
+  //         }
+  //       });
+  // }
 }
 
 function closeCreatePostModal() {

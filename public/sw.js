@@ -1,7 +1,7 @@
 importScripts('/src/js/idb.js');
 importScripts('/src/js/utility.js');
 
-var CACHE_STATIC_NAME = 'static-v25';
+var CACHE_STATIC_NAME = 'static-v33';
 var CACHE_DYNAMIC_NAME = 'dynamic-v5';
 var STATIC_FILES = [
     '/',
@@ -181,3 +181,43 @@ self.addEventListener('fetch', function (event) {
 //         fetch(event.request)
 //     );
 // });
+
+self.addEventListener('sync', function (event) {
+    console.log('[SW] background syncing', event);
+    if (event.tag === 'sync-new-post') {
+        console.log('[SW] Syncing new post');
+        event.waitUntil(
+            readAllData('sync-posts')
+                .then(function (data) {
+                    for (var dt of data) {
+                        fetch('https://us-central1-pwagram-64b75.cloudfunctions.net/storePostData', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                id: dt.id,
+                                title: dt.title,
+                                location: dt.location,
+                                image: "https://firebasestorage.googleapis.com/v0/b/pwagram-64b75.appspot.com/o/sf-boat.jpg?alt=media&token=2caa6d2a-1788-4f2a-a978-4962ea20712b"
+                            })
+                        })
+                        .then(function (res) {
+                            console.log('Sent Data: ', res);
+                            if (res.ok) {
+                                res.json()
+                                    .then(function (resData) {
+                                        deleteItemFromData('sync-posts', resData.id);
+                                    })
+                            }
+                        })
+                        .catch(function (err) {
+                            console.log('Error while sending data', err);
+                        })
+                    }
+
+                })
+        );
+    }
+});
